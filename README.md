@@ -64,5 +64,9 @@ This application allows users to encrypt and decrypt images using pixel manipula
 - Click "Encryption" to load an image, encrypt it, and save the encrypted image and key.
 - Click "Decryption" to load an encrypted image, load the key, decrypt the image, and save the decrypted image.
 
+## Developer Notes
+- This application was developed for cross-platform compatibility but primarily tested on Windows machines.
+- Ensure that all required images (`sun.png`, `moon.png`, etc.) are present in the `images` directory if you implement the light/dark mode toggle in the future.
+
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
