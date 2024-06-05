@@ -1,4 +1,3 @@
-
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from PIL import Image
@@ -6,51 +5,51 @@ import numpy as np
 import os
 import json
 
-# Global variables
+# Global variables to maintain the state
 current_image = None
 encryption_key = None
 is_encrypted = False
 is_decrypted = False
 encrypted_image_saved = False
-marker_value = 255  # This can be any value that doesn't normally occur in the image
+marker_value = 255  # This marker helps to identify encrypted images
 
-# Function to load the image
+# Function to load a new image for encryption
 def load_image():
     global current_image, encryption_key, is_encrypted, is_decrypted, encrypted_image_saved
     try:
         file_path = filedialog.askopenfilename(title="Open Image to be Encrypted")
         if file_path:
             image = Image.open(file_path)
-            img_display = ctk.CTkImage(light_image=image, size=(300, 300))  # Adjust size to fit GUI
+            img_display = ctk.CTkImage(light_image=image, size=(300, 300))  # Resize image to fit GUI
             img_label.configure(image=img_display, text="")
             img_label.image = img_display
             current_image = image
-            encryption_key = None
+            encryption_key = None  # Reset encryption key
             is_encrypted = False
             is_decrypted = False
             encrypted_image_saved = False
     except Exception as e:
         messagebox.showerror("Error", f"Failed to load image: {e}")
 
-# Function to load the encrypted image
+# Function to load an already encrypted image
 def load_encrypted_image():
     global current_image, encryption_key, is_encrypted, is_decrypted, encrypted_image_saved
     try:
         file_path = filedialog.askopenfilename(title="Open Encrypted Image")
         if file_path:
             image = Image.open(file_path)
-            img_display = ctk.CTkImage(light_image=image, size=(300, 300))  # Adjust size to fit GUI
+            img_display = ctk.CTkImage(light_image=image, size=(300, 300))  # Resize image to fit GUI
             img_label.configure(image=img_display, text="")
             img_label.image = img_display
             current_image = image
-            encryption_key = None
+            encryption_key = None  # Reset encryption key
             is_encrypted = False
             is_decrypted = False
             encrypted_image_saved = False
     except Exception as e:
         messagebox.showerror("Error", f"Failed to load image: {e}")
 
-# Function to generate an encryption key
+# Function to generate a random encryption key
 def generate_key(image):
     width, height = image.size
     channels = 4 if image.mode == 'RGBA' else 3
@@ -60,34 +59,34 @@ def generate_key(image):
 # Function to add a marker to the encrypted image
 def add_marker(image):
     pixels = np.array(image)
-    pixels[0, 0, 0] = marker_value  # Set a marker value at a known location
+    pixels[0, 0, 0] = marker_value  # Set marker at the first pixel
     return Image.fromarray(pixels, image.mode)
 
-# Function to check for the marker in the encrypted image
+# Function to check for the marker in an image
 def check_marker(image):
     pixels = np.array(image)
     return pixels[0, 0, 0] == marker_value
 
-# Function to encrypt the image
+# Function to encrypt the image using XOR operation with the key
 def encrypt_image(image, key):
     pixels = np.array(image)
-    key = key[:pixels.shape[0], :pixels.shape[1], :pixels.shape[2]]
+    key = key[:pixels.shape[0], :pixels.shape[1], :pixels.shape[2]]  # Match key size with image
     encrypted_pixels = np.bitwise_xor(pixels, key)
     encrypted_image = Image.fromarray(encrypted_pixels, image.mode)
-    encrypted_image = add_marker(encrypted_image)
+    encrypted_image = add_marker(encrypted_image)  # Add marker to the encrypted image
     return encrypted_image
 
-# Function to decrypt the image
+# Function to decrypt the image using XOR operation with the key
 def decrypt_image(image, key):
     if not check_marker(image):
         raise ValueError("The provided image is not encrypted.")
     pixels = np.array(image)
-    key = key[:pixels.shape[0], :pixels.shape[1], :pixels.shape[2]]
+    key = key[:pixels.shape[0], :pixels.shape[1], :pixels.shape[2]]  # Match key size with image
     decrypted_pixels = np.bitwise_xor(pixels, key)
     decrypted_image = Image.fromarray(decrypted_pixels, image.mode)
     return decrypted_image
 
-# Handle encryption button click
+# Function to handle encryption button click
 def handle_encrypt():
     global encryption_key, is_encrypted
     if current_image:
@@ -104,7 +103,7 @@ def handle_encrypt():
     else:
         messagebox.showwarning("Warning", "Please add an image to be encrypted")
 
-# Handle decryption button click
+# Function to handle decryption button click
 def handle_decrypt():
     global encryption_key, is_decrypted
     if current_image:
@@ -121,7 +120,7 @@ def handle_decrypt():
     else:
         messagebox.showwarning("Warning", "Please add an image to be decrypted")
 
-# Save the encryption key to a file
+# Function to save the encryption key to a file
 def save_key(key):
     key_file_path = filedialog.asksaveasfilename(title="Save Encryption Key", defaultextension=".key", filetypes=[("Key files", "*.key"), ("All files", "*.*")])
     if key_file_path:
@@ -130,7 +129,7 @@ def save_key(key):
         return True
     return False
 
-# Load the encryption key from a file
+# Function to load the encryption key from a file
 def load_key(title="Select a Key"):
     key_file_path = filedialog.askopenfilename(title=title, filetypes=[("Key files", "*.key"), ("All files", "*.*")])
     if key_file_path:
@@ -139,15 +138,15 @@ def load_key(title="Select a Key"):
         return key
     return None
 
-# Display the image
+# Function to display the image on the GUI
 def display_image(image):
-    img_display = ctk.CTkImage(light_image=image, size=(300, 300))  # Adjust size to fit GUI
+    img_display = ctk.CTkImage(light_image=image, size=(300, 300))  # Resize image to fit GUI
     img_label.configure(image=img_display, text="")
     img_label.image = img_display
     global current_image
     current_image = image
 
-# Save the encrypted image to a file
+# Function to save the encrypted image to a file
 def save_encrypted_image():
     global encrypted_image_saved
     if is_encrypted:
@@ -161,7 +160,7 @@ def save_encrypted_image():
     else:
         messagebox.showwarning("Warning", "Please encrypt image before saving")
 
-# Save the decrypted image to a file
+# Function to save the decrypted image to a file
 def save_decrypted_image():
     if is_decrypted:
         try:
@@ -173,7 +172,7 @@ def save_decrypted_image():
     else:
         messagebox.showwarning("Warning", "Please decrypt image before saving")
 
-# Show encryption buttons
+# Function to show encryption-related buttons
 def show_encryption_buttons():
     hide_initial_buttons()
     clear_image()
@@ -182,7 +181,7 @@ def show_encryption_buttons():
     save_encrypted_button.pack(side='left', padx=10)
     go_back_button_encryption.pack(side='left', padx=10)
 
-# Show decryption buttons
+# Function to show decryption-related buttons
 def show_decryption_buttons():
     hide_initial_buttons()
     clear_image()
@@ -191,7 +190,7 @@ def show_decryption_buttons():
     save_decrypted_button.pack(side='left', padx=10)
     go_back_button_decryption.pack(side='left', padx=10)
 
-# Hide all buttons and show initial buttons
+# Function to go back to initial screen from encryption screen
 def go_back_encryption():
     if not current_image or (current_image and not is_encrypted) or encrypted_image_saved:
         hide_encryption_buttons()
@@ -200,38 +199,39 @@ def go_back_encryption():
     elif is_encrypted and not encrypted_image_saved:
         messagebox.showwarning("Warning", "Please save the encrypted image")
 
+# Function to go back to initial screen from decryption screen
 def go_back_decryption():
     hide_decryption_buttons()
     clear_image()
     show_initial_buttons()
 
-# Hide initial buttons
+# Function to hide initial buttons
 def hide_initial_buttons():
     encryption_button.pack_forget()
     decryption_button.pack_forget()
 
-# Show initial buttons
+# Function to show initial buttons
 def show_initial_buttons():
     encryption_button.pack(pady=20)
     decryption_button.pack(pady=20)
 
-# Hide encryption buttons
+# Function to hide encryption-related buttons
 def hide_encryption_buttons():
     load_button.pack_forget()
     encrypt_button.pack_forget()
     save_encrypted_button.pack_forget()
     go_back_button_encryption.pack_forget()
 
-# Hide decryption buttons
+# Function to hide decryption-related buttons
 def hide_decryption_buttons():
     load_encrypted_button.pack_forget()
     decrypt_button.pack_forget()
     save_decrypted_button.pack_forget()
     go_back_button_decryption.pack_forget()
 
-# Clear the displayed image
+# Function to clear the displayed image
 def clear_image():
-    blank_image = Image.new('RGBA', (300, 300), (255, 255, 255, 0))  # Adjust size to fit GUI
+    blank_image = Image.new('RGBA', (300, 300), (255, 255, 255, 0))  # Create a blank image
     img_display = ctk.CTkImage(light_image=blank_image, size=(300, 300))
     img_label.configure(image=img_display, text="")
     img_label.image = img_display
@@ -280,7 +280,7 @@ decrypt_button = ctk.CTkButton(frame, text="Decrypt", command=handle_decrypt)
 save_decrypted_button = ctk.CTkButton(frame, text="Save Image", command=save_decrypted_image)
 go_back_button_decryption = ctk.CTkButton(frame, text="Go Back", command=go_back_decryption)
 
-# Image label
+# Image label to display images
 img_label = ctk.CTkLabel(frame, text="")
 img_label.pack(pady=20)
 
