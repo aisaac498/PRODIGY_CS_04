@@ -1,4 +1,4 @@
-#this code works push to git hub
+
 import customtkinter as ctk
 from tkinter import filedialog, messagebox
 from PIL import Image
